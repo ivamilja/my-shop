@@ -17,6 +17,6 @@ export class BootstrapNavbarComponent {
   ngOnInit() {
   }
   logout() {
-    
+    this.auth.logout();
   }
 }
