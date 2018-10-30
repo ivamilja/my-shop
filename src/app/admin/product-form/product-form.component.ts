@@ -1,3 +1,4 @@
+import { ProductService } from './../../product.service';
 import { AngularFireModule } from '@angular/fire';
 import { CategoryService } from './../../category.service';
 import { Component, OnInit } from '@angular/core';
@@ -10,12 +11,19 @@ import { AngularFireList } from '@angular/fire/database';
   styleUrls: ['./product-form.component.css']
 })
 export class ProductFormComponent implements OnInit {
+
   categories$;
-  constructor(categoryService: CategoryService) { 
-    this.categories$ = categoryService.getCategories();
+
+  constructor(public categoryService: CategoryService,private producService: ProductService) { 
+
   }
 
   ngOnInit() {
+    this.categories$= this.categoryService.getCategories();
+  }
+
+  save(product) {
+    this.producService.create(product);
   }
 
 }
