@@ -1,3 +1,5 @@
+import { ActivatedRoute } from '@angular/router';
+import { ProductService } from './../product.service';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -5,11 +7,27 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './product-view.component.html',
   styleUrls: ['./product-view.component.css']
 })
-export class ProductViewComponent implements OnInit {
+export class ProductViewComponent {
 
-  constructor() { }
+  products: any[]=[];
+  filteredProduct:any[];
+ 
+  category: string;
 
-  ngOnInit() {
-  }
+  constructor(productService: ProductService,  route: ActivatedRoute) {
+    productService.getAll().subscribe(products=>{
+      
+      this.products=products;
+      route.queryParamMap.subscribe(params=>{
+        this.category=params.get('category');
+        this.filteredProduct=(this.category)? this.products.filter(p=>p.category===this.category): this.products;
+      });
+
+    });
+
+   
+   }
+
+ 
 
 }
