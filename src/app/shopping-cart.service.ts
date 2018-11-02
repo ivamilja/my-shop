@@ -1,3 +1,4 @@
+import { ShoppingCart } from './models/shopping-cart';
 import { take, map } from 'rxjs/operators';
 import { AngularFireDatabase, AngularFireObject } from '@angular/fire/database';
 import { Injectable } from '@angular/core';
@@ -14,7 +15,7 @@ export class ShoppingCartService {
     });
   }
 
-   async getCart() {
+   async getCart():Promise<AngularFireObject<ShoppingCart>> {
     let cartId = await this.getCartId();
     return this.db.object('/shopping-carts/'+cartId);
   }
@@ -33,9 +34,8 @@ export class ShoppingCartService {
     let item1$=this.db.object('/shopping-carts/'+cartId+'/items/'+product.key);
    item1$.snapshotChanges().pipe(take(1)).subscribe(l=>{
      
-     if(!l.payload.exists()) {item1$.set({product:product, quantity:1});
-     console.log('ejj'+l);
-   }else {
+    if(!l.payload.exists()) item1$.set({product:product, quantity:1});
+    else {
      let o=JSON.stringify(l.payload);
      let q=+o.charAt(o.length-2);
   

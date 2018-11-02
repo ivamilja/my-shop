@@ -1,3 +1,4 @@
+import { ShoppingCartService } from './../shopping-cart.service';
 import { AppUser } from './../models/app-user';
 import { AuthService } from './../auth.service';
 import { Component, OnInit } from '@angular/core';
@@ -8,12 +9,19 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './bootstrap-navbar.component.html',
   styleUrls: ['./bootstrap-navbar.component.css']
 })
-export class BootstrapNavbarComponent {
+export class BootstrapNavbarComponent implements OnInit{
  appUser: AppUser;
-  constructor(public auth: AuthService) {
-   auth.appUser$.subscribe(appUser=>this.appUser=appUser);
+ shoppingCartTotal:number;
+  constructor(public auth: AuthService, private shoppingCartService: ShoppingCartService) {
   }
-  ngOnInit() {
+  async ngOnInit() {
+    this.auth.appUser$.subscribe(appUser=>this.appUser=appUser);
+    let cart$= await this.shoppingCartService.getCart();
+    cart$.valueChanges().subscribe(cart=>{
+      this.shoppingCartTotal=0;
+     for(let productId in cart.items)
+       this.shoppingCartTotal+=cart.items[productId].quantity
+    })
   }
   logout() {
     this.auth.logout();
