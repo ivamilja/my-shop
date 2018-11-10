@@ -1,7 +1,9 @@
+import { async } from '@angular/core/testing';
 import { ShoppingCart } from './models/shopping-cart';
 import { take, map } from 'rxjs/operators';
 import { AngularFireDatabase, AngularFireObject } from '@angular/fire/database';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -9,15 +11,17 @@ import { Injectable } from '@angular/core';
 export class ShoppingCartService {
   
   constructor(private db:AngularFireDatabase) { }
+
   private create() {
     return this.db.list('/shopping-carts').push({
       dateCreated: new Date().getTime()
     });
   }
 
-   async getCart():Promise<AngularFireObject<ShoppingCart>> {
+   async getCart():Promise<Observable<ShoppingCart>> {
     let cartId = await this.getCartId();
-    return this.db.object('/shopping-carts/'+cartId);
+    return this.db.object('/shopping-carts/'+cartId).valueChanges()
+    .pipe(map(x=>new ShoppingCart(x['items'])))
   }
 
  private async getCartId() {
@@ -30,31 +34,42 @@ export class ShoppingCartService {
       return cartId;
   }
   async addToCart(product) {
+    if(product!=undefined){
     let cartId = await this.getCartId();
     let item1$=this.db.object('/shopping-carts/'+cartId+'/items/'+product.key);
    item1$.snapshotChanges().pipe(take(1)).subscribe(l=>{
      
-    if(!l.payload.exists()) item1$.set({product:product, quantity:1});
+    if(!l.payload.exists()) item1$.set({title:product.title,imageUrl:product.imageUrl,price:product.price, quantity:1});
     else {
-     let o=JSON.stringify(l.payload);
-     let q=+o.charAt(o.length-2);
-  
-     item1$.update({quantity: q+1 });
-    
+    const data= l.payload.val();
+    let Q=data['quantity'];
+     item1$.update({quantity: Q+1 });
    }
    })
 }
+  }
 async removeFromCart(product) {
+  if(product!=undefined){
   let cartId = await this.getCartId();
   let item1$=this.db.object('/shopping-carts/'+cartId+'/items/'+product.key);
  item1$.snapshotChanges().pipe(take(1)).subscribe(l=>{
    
-   if(!l.payload.exists()) item1$.set({product:product, quantity:1});
+   if(!l.payload.exists()) item1$.set({title:product.title,imageUrl:product.imageUrl,price:product.price, quantity:1});
    else {
-   let o=JSON.stringify(l.payload);
-   let q=+o.charAt(o.length-2);
-
-   item1$.update({quantity: q-1 });
- }})
+    const data= l.payload.val();
+    let Q=data['quantity'];
+    if(Q===1) 
+      item1$.remove();
+    else
+    item1$.update({quantity: Q-1 });
 }
+ })
+}
+}
+  
+async clearCart(){
+  let cartId=await this.getCartId();
+  this.db.object('/shopping-carts/'+cartId+'/items').remove();
+}
+
 }
