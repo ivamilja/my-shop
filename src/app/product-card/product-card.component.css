@@ -1,6 +1,10 @@
 .card-footer{
     padding: 0;
 }
+.card-img-top{
+   height: 460px;
+    object-fit: cover;
+}
 .card{
     margin-bottom: 30px;
     width: 18 rem;

@@ -1,10 +1,10 @@
 import { ShoppingCart } from './../models/shopping-cart';
-import { Subscription, Observable } from 'rxjs';
+import {  Observable } from 'rxjs';
 import { ShoppingCartService } from './../shopping-cart.service';
 import { ActivatedRoute } from '@angular/router';
 import { ProductService } from './../product.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ShoppingCart } from '../models/shopping-cart';
+
 
 @Component({
   selector: 'app-product-view',

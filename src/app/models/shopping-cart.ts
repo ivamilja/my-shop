@@ -8,7 +8,7 @@ export class ShoppingCart implements OnInit{
   public items: ShoppingCartItem[]=[];
   public product:any[]=[];
 
-  constructor(public itemsMap:{[productId:string]: ShoppingCartItem}){
+  constructor(private itemsMap:{[productId:string]: ShoppingCartItem}){
     this.itemsMap=this.itemsMap || {};
    
     for(let productId in itemsMap){
@@ -18,7 +18,6 @@ export class ShoppingCart implements OnInit{
     x.key=productId;
     this.items.push(x);   
   }
-  
   }
   
   
